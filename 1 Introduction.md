@@ -36,3 +36,23 @@ Admin提交队列与Admin完成队列唯一关联。
 
 对于NVMe over Fabrics的实现，请参考NVMe over Fabrics specification 的1.4.14章节。
 
+### 1.6.9 控制器（**controller**）
+
+控制器是指主机与NVM子系统之间的接口，其有三种类型：
+
+- I/O控制器
+- 发现控制器
+- 管理控制器
+
+控制器运行主机提交到提交队列的命令，并在完成队列中Post完成消息。所有控制器实现一个Admin提交队列和一个Admin完成队列。根据具体的控制器类型，控制器可能实现一个或者多个IO的提交队列和完成队列。当PCI Express作为传输层时，控制器就是PCI Express功能。
+
+### 1.6.10 **directive**
+
+
+
+### 1.6.11 discovery controller
+
+
+
+
+
