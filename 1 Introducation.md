@@ -1,20 +1,54 @@
 # 1 引言
 
-## 1.1 概览
+## 1.1 概述
 NVM Express(NVMe)接口允许主机软件与非易失性内存子系统交互。该接口针对企业级和消费级固态硬盘进行了优化，通常作为寄存器级接口连接到PCI Express接口。
+
+注：在开发过程中，该规范被称为企业NV MHCI。然而，在完成之前该名称已修改为 NVM Express base Specification。该接口同时针对客户级和企业级系统。
+
+要了解从 1.3 版到 1.4 版的变化，请参阅 http://nvmexpress.org/changes 的文档，该文档描述了新功能，包括控制器必须符合 1.4 版的强制要求。
 
 ### 1.1.1 NVMe Over PCIe and NVMe Over Fabrics
 
+NVM Express基础规范修订版1.4和之前的版本为主机软件通过PCI Express（NVMe TM over PCIe TM）与非易失性存储器子系统通信定义了寄存器级接口。NVMe TM over Fabrics规范定义了协议接口和与NVMe接口在其他网络（例如Ethernet、InfiniBand、Fibre Channel）上的相关扩展。The NVMe over Fabrics specification has an NVMe Transport binding for each NVMe Transport (either within that specification or by reference).
+
+在本规范中，需求或功能可能被记录为特定于NVMe over Fabrics实现或特定于NVMe Transport绑定。此外，功能及其支持要求在NVMe over PCIe和NVMe over Fabrics中的实现可能有所不同。
 
 ## 1.2 适用范围
 
-## 1.3 超出范围
+该规范定义了与NVM子系统中的控制器通信的寄存器接口，还定义了可能由控制器支持的标准命令集，有三种类型的控制器具有不同的功能：a）I/O控制器；b）发现控制器；c）管理控制器（参见第7.1节）。
 
-## 1.4 操作原理
+在本文中，如果控制器类型可以根据上下文确定时，通常使用通用术语controller来代替特定的控制器类型。
+
+## 1.3 范围以外
+
+寄存器接口和命令集与NVM任何使用模型无关，而只是指定了与NVM子系统的通信接口。因此，该规范没有指定NVM系统是否用作固态驱动器、主存储器、缓存存储器、备份存储器、冗余存储器等。特定的使用模型在范围之外，是可选的，并且没有授权。
+
+该接口在任意NVM管理功能之上定义，如磨损均衡。擦除和其他针对NAND 等 NVM 技术的管理任务被抽象了。
+
+本规范不包含任何缓存算法或技术。
+
+实现或使用本规范中提到的其他已发布规范，即使需要遵守本规范，也超出本规范的范围（例如PCI、PCI Express和PCI-X）。
+
+## 1.4 操作理论
 
 ### 1.4.1 多路径I/O及namespace共享
 
 ## 1.5 惯例
+
+对于所有标记为Reserved的位和寄存器，硬件应返回“0”，而主机软件应将所有保留的位和寄存器的值写为0h。在寄存器部分（即第2部分和第3部分）中，使用以下术语和缩写：
+
+| 术语          | 说明                                                         |
+| ------------- | ------------------------------------------------------------ |
+| RO            | Read Only                                                    |
+| RW            | Read Write                                                   |
+| R/W           | Read Write. The value read may not be the last value written. |
+| **RWC**       | Read/Write ‘1’ to clear                                      |
+| **RWS**       | Read/Write ‘1’ to set                                        |
+| **Impl Spec** | Implementation Specific – the controller has the freedom to choose its implementation |
+| **HwInit**    | The default state is dependent on NVM Express controller and system configuration |
+| **Reset**     | For section 2, this column indicates the value of the field after a reset. as defined by the appropriate PCI or PCI Express specifications. For section 3, this column indicates the value of the field after a Controllersection 3, this column indicates the value of the field after a Controller Level Reset as defined in section 7.3.2. |
+
+对于一些寄存器字段，若其是RW、RWC还是RO，则表明是实现；如果为RW/RO或RWC/RO，则表示不支持该功能。
 
 
 ## 1.6 术语解释
@@ -250,5 +284,4 @@ optional关键字表示本规范非必选功能。但是如果要实现本规范
 图 8 说明了字节、字和双字之间的关系。qword(quadruple word) 是数据的单位，大小是字的四倍；由于空间限制，这里没有说明。除非另有说明，否则本规范以小端格式指定数据。
 
 ![avatar](images/figure8.bits_word_dword.png)
-
 
