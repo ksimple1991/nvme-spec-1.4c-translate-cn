@@ -313,7 +313,7 @@ optional关键字表示本规范非必选功能。但是如果要实现本规范
 一个关键词，表示有强烈偏好的备选方案的可选择。相当于短语“推荐”。
 
 
-### 1.7.8 Byte, Word, and Dword Relationships
+## 1.8 Byte, Word, and Dword Relationships
 
 图 8 说明了字节、字和双字之间的关系。qword(quadruple word) 是数据的单位，大小是字的四倍；由于空间限制，这里没有说明。除非另有说明，否则本规范以小端格式指定数据。
 
