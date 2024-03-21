@@ -57,6 +57,14 @@ NVM Express 可扩展接口旨在满足使用基于 PCI Express 的固态驱动�
 
 命名空间是可被格式化为逻辑块的非易失性存储的数量。NVM Express控制器可以支持使用一个ID引用多个命名空间。可以使用Namespace Management和Namespace Attachment命令创建和删除命名空间。Identify Namespace数据结构中记录了命名空间的功能和设置。Identify Namespace中namespace ID 为FFFFFFFFh时，则代表所有命名空间都具有的通用的功能和设置。
 
+NVM Express接口基于成对的SQ和CQ。主机软件先将命令放置到CQ中，命令处理完成后，由控制器将完成的命令放置到对应的CQ中。多个SQ可以对应同一个的CQ。另外，SQ和CQ都是从内存中分配。
+
+为了达成管理和操作控制器的目的，需要有Admin SQ和对应的CQ存在（例如，创建和删除IO SQ和CQ，以及终止命令等）。Admin SQ中只允许提交Admin命令。
+
+IO命令集与IO队列对搭配使用。本规范定义了名为NVM命令集的IO命令集。主机选择一个用于所有IO队列对的IO命令集。（TODO:不通顺）
+
+
+
 ### 1.4.1 多路径I/O及namespace共享
 
 ## 1.5 惯例
