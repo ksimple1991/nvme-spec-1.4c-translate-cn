@@ -63,7 +63,17 @@ NVM Express接口基于成对的SQ和CQ。主机软件先将命令放置到CQ中
 
 IO命令集与IO队列对搭配使用。本规范定义了名为NVM命令集的IO命令集。主机选择一个用于所有IO队列对的IO命令集。（TODO:不通顺）
 
+主机软件创建队列的最大数量为控制器支持的最大数量。通常，创建队列的数量取决于系统配置和预期的负载。例如，在四核处理器的系统上，每个核心有一个队列对，这样去避免锁的影响，同时确保创建的数据结构在适当的处理器核心的缓存中。图1展示了一个队列对，其中SQ和CQ为1:1映射。
 
+![avatar](images/figure-1-QueuePair_1-1_mapping.png)
+
+图2示例中Core B上多个I/O SQ使用同一个I/O CQ。图1和图2表明，Admin SQ 和 Admin CQ 始终是一一对应的。
+
+![avatar](images/figure-2-QueuePair_N-1_mapping.png)
+
+提交队列（SQ）是一个固定容量大小的循环缓冲区，主机软件用它来提交命令给控制器执行。当有1到 n 个新命令要执行时，主机软件更新恰当的 SQ Tail doorbell 寄存器。当有新的门铃寄存器写入时，控制器中的先前SQ Tail值将被重写。控制器按顺序从提交队列中检索SQ条目，并可以按任何顺序执行这些命令。当doorbell 寄存器写入新值时，控制器中的先前SQ Tail值将被重写。控制器按顺序从提交队列中获取SQ条目，之后以任意顺序执行。
+
+每个提交队列条目都是一个命令。命令大小为64字节。传输数据在物理内存中位置由Physical Region Page（PRP）条目或Scatter Gather Lists指定。每个命令可以包括两个 PRP 条目或一个 Scatter Gather Lists（SGL）段。如果两个 PRP 条目不足以存放数据，最后一个PRP条目可以是一个PRP 列表的指针。如果数据缓冲需要一个以上的 SGL 分段，则SGL 分段可以是指向下一个 SGL 分段的指针。
 
 ### 1.4.1 多路径I/O及namespace共享
 
