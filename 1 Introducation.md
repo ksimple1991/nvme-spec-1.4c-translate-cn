@@ -81,6 +81,38 @@ IO命令集与IO队列对搭配使用。本规范定义了名为NVM命令集的I
 
 该部分是多路径 I/O 和命名空间共享的概述。多路径 I/O 是指单个主机和命名空间之间有两个或更多的完全独立的路径，而命名空间共享是指两个或更多主机使用不同的 NVM Express 控制器访问公共的共享命名空间。多路径 I/O 和共享命名空间都需要 NVM 子系统包含两个或更多控制器。支持多路径 I/O 和共享命名空间的 NVM 子系统还可能支持不对称的控制器行为（参见第 1.4.2 节）。两个或更多主机对共享命名空间的并发访问需要主机之间进行某种形式的协调。用于协调这些主机的程序超出本规范的范围。
 
+图 3 显示了一个包含一个 NVM Express 控制器和一个 PCI Express  端口的NVM 子系统。由于这是一个单一的功能 PCI Express 设备，因此 NVM Express 控制器应与 PCI  Function 0 相关联。控制器可以支持多个名称空间，如图 3 所示，控制器支持名为 NSA 和 NSB 两个命名空间。每个控制器命名空间都有一个ID，分别为 NSID1 和 NSID2，控制器将使用这些ID来引用特定的命名空间。命名空间ID与命名空间本身并不相同，它是主机和控制器用于在命令中指定特定命名空间的句柄。控制器命名空间 ID的选择不在了本规范的范围。在这个例子中，NSID 1与 NSA 关联，NSID 2 与 NSB 关联，它们都是控制器私有的命名空间，这种配置既不支持多路径也不支持命名空间共享。
+
+![avatar](images/fugure-3-ControllerWithTwoNS.png)
+
+图4展示了一个multi-Function NVM 子系统，一个PCI 端口包含了两个控制器，其中一个控制器与 PCI Function 0 关联，另一个与 PCI Function 1关联。每个控制器可以访问一个私有的命名空间和共享命名空间B。所有访问共享命名空间B的控制器中，命名空间的ID应该是相同的。在此例子中，两个控制器都使用命名空间 ID 2 来访问命名空间B。
+
+![figure-4-NVMSubsystemWithTwoControllerAndOnePort](/Users/kangjia/code/nvme-spec-1.4c/images/figure-4-NVMSubsystemWithTwoControllerAndOnePort.png)
+
+每个控制器都有一个唯一的 Identify Controller 数据结构，每个命名空间也都有一个唯一的 Identify Controller 数据结构。有权限访问共享命名空间的控制器会返回该共享命名空间对应 Identify Namespace 数据结构（例如，具有共享命名空间访问权限的所有控制器都将返回相同的数据结构内容）。命名空间 ID 是全局唯一的，从而可以确定相同命名空间是否存在多路径，参见7.10节。
+
+与共享命名空间关联的控制可以并发操作命名空间。Operations performed by individual controllers are atomic to the shared namespace at the write atomicity level of the controller to which the command was submitted (refer to section 6.4). 共享命名空间的控制器间，其写入原子性级别并不需要相同。如果访问共享命名空间的不同控制器发出的命令有顺序要求，那么主机软件或相关应用程序需要强制按照这些顺序要求执行。
+
+图 5 演示了一个带有两个 PCIe 端口的 NVM 子系统，每个端口都关联一个控制器。两个控制器都映射到相应端口的 PCI Function 0。在这个示例中，每个 PCIe 端口都是完全独立的，并具有独立的 PCIe 复位和时钟输入。端口的复位只影响与该端口关联的控制器，不会影响其他控制器、共享命名空间或由其他控制器在共享命名空间上执行的操作。
+
+![figure-5-NVMSubSystemWithTwoControllerAndTwoPorts](/Users/kangjia/code/nvme-spec-1.4c/images/figure-5-NVMSubSystemWithTwoControllerAndTwoPorts.png)
+
+图5中两个端口可能与相同或不同的Root Complex关联，用以实现多路径和共享命名空间架构。PCI Express 结构中的系统级架构方面和多个端口的使用超出了本规范的范围。
+图6为支持 Single Root I/O Virtualization（SR/IOV）的 NVM 子系统，其有一个物理 Function 和四个虚拟 Function。如图，每个Function 都有一个关联的 Controller，每个 Controller 都有一个私有的 命名空间和对所有控制器共享的 NS F 的访问权限。此示例中控制器的行为与本节中其他示例的行为类似。 有关 SR-IOV 的更多信息，请参阅第 8.5.4 节。
+
+![figure-6-PCIExpressSuportSRIOV](/Users/kangjia/code/nvme-spec-1.4c/images/figure-6-PCIExpressSuportSRIOV.png)
+
+本节中所列示例旨在说明概念，而非枚举所有可能的配置。 例如，NVM 子系统可能包含多个 PCI Express 端口，每个端口都支持 SR-IOV。
+
+### 1.4.2 非对称控制器行为
+
+不对称控制器行为发生在NVM子系统中，其中名称空间访问特性（例如性能）可能根据以下情况而有所不同：
+
+- NVM子系统的内部配置；
+- 用于访问名称空间（例如，Fabrics）的控制器。
+
+提供不对称控制器行为的NVM子系统可以支持8.20节中描述的不对称命名空间访问报告。
+
 ## 1.5 惯例
 
 对于所有标记为Reserved的位和寄存器，硬件应返回“0”，而主机软件应将所有保留的位和寄存器的值写为0h。在寄存器部分（即第2部分和第3部分）中，使用以下术语和缩写：
@@ -97,6 +129,32 @@ IO命令集与IO队列对搭配使用。本规范定义了名为NVM命令集的I
 | **Reset**     | For section 2, this column indicates the value of the field after a reset. as defined by the appropriate PCI or PCI Express specifications. For section 3, this column indicates the value of the field after a Controllersection 3, this column indicates the value of the field after a Controller Level Reset as defined in section 7.3.2. |
 
 对于一些寄存器字段，若其是RW、RWC还是RO，则表明是实现；如果为RW/RO或RWC/RO，则表示不支持该功能。
+
+当在文档中引用寄存器字段时，使用的约定是“Register Symbol.Field Symbol”。例如，PCI命令寄存器 Parity Error Response Enable 通过名称 CMD. PEE 引用。如果寄存器字段是位数组，则该字段称为 “Register Symbol.Field Symbol (array offset to element)”。
+
+A 0’s based value is a numbering scheme in which the number 0h represents a value of 1h, 1h represents 2h, 2h represents 3h, etc. In this numbering scheme, there is no method to represent the value of 0h. Values in this specification are 1-based (i.e., the number 1h represents a value of 1h, 2h represents 2h, etc.) unless otherwise specified.
+
+二进制或十进制的单位及代表符号如图7所示：
+
+![figure-7](/Users/kangjia/code/nvme-spec-1.4c/images/figure-7.png)
+
+^ 表示数字或符号的幂。
+
+一些参数被定义为 ASCII 字符串。ASCII 字符串仅包含代码值 20h 到 7Eh。对于字符串“Copyright”，字符“C”是第一个字节，字符“o”是第二个字节，等等。字符串左对齐，并在必要时用空格（ASCII 代码值 20h）填充到右侧。十六进制 ASCII 字符串是使用代码值子集的 ASCII 字符串：“0”到“9”，“A”到“F”大写，“a”到“f”小写。
+
+十六进制（即十六进制）数字用小写“h”后缀表示（例如，0FFFh，80h）。十六进制数字大于八位时，用下划线字符分隔每个八位组（例如，1E_DEADBEE Fh）。
+
+二进制（即二进制）数字用小写字母“b”结尾（例如，1001b，10b）。大于四个数字的二进制数字用下划线字符分隔每组四个数字（例如，1000_0110_0010b）。
+
+所有其他数字都是十进制（即，十进制）。在这个规范中，十进制数字由仅由西阿拉伯数字0到9组成的任何数字序列表示，后面不紧跟小写字母b或小写字母h（例如，175）。这个规范使用以下惯例来表示十进制数字：
+
+a）十进制分隔符（即，将数字的整数部分和小数部分分开）是句点；
+
+b）千位分隔符（即，将数的一部分中的三个十进制数字分开）是逗号；
+
+c）千位分隔符仅用于数字的整数部分，而不是数字的小数部分；
+
+d）年份的十进制表示法不包括逗号（例如，2019而不是2，019）。
 
 
 ## 1.6 术语解释
