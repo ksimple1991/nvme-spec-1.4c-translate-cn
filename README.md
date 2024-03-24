@@ -2,6 +2,9 @@
 
 ### NVM-Express Base Specification Revision 1.4c
 
+### 介绍
+NVM-Express-1_4c-2021.06.28-Ratified 规范的中文翻译。个人英文水平极为有限，阅读不畅，因此选择翻译记录下来。
+
 ### 规则
 - 保证意思准确，语句通顺，避免逐词翻译
 - 中文和英文两端要有空格
