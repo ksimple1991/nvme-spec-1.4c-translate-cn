@@ -136,7 +136,7 @@ A 0’s based value is a numbering scheme in which the number 0h represents a va
 
 二进制或十进制的单位及代表符号如图7所示：
 
-![figure-7](/Users/kangjia/code/nvme-spec-1.4c/images/figure-7.png)
+![figure-7](images/figure-7.png)
 
 ^ 表示数字或符号的幂。
 
