@@ -87,7 +87,7 @@ IO命令集与IO队列对搭配使用。本规范定义了名为NVM命令集的I
 
 图4展示了一个multi-Function NVM 子系统，一个PCI 端口包含了两个控制器，其中一个控制器与 PCI Function 0 关联，另一个与 PCI Function 1关联。每个控制器可以访问一个私有的命名空间和共享命名空间B。所有访问共享命名空间B的控制器中，命名空间的ID应该是相同的。在此例子中，两个控制器都使用命名空间 ID 2 来访问命名空间B。
 
-![figure-4-NVMSubsystemWithTwoControllerAndOnePort](/Users/kangjia/code/nvme-spec-1.4c/images/figure-4-NVMSubsystemWithTwoControllerAndOnePort.png)
+![figure-4-NVMSubsystemWithTwoControllerAndOnePort](images/figure-4-NVMSubsystemWithTwoControllerAndOnePort.png)
 
 每个控制器都有一个唯一的 Identify Controller 数据结构，每个命名空间也都有一个唯一的 Identify Controller 数据结构。有权限访问共享命名空间的控制器会返回该共享命名空间对应 Identify Namespace 数据结构（例如，具有共享命名空间访问权限的所有控制器都将返回相同的数据结构内容）。命名空间 ID 是全局唯一的，从而可以确定相同命名空间是否存在多路径，参见7.10节。
 
@@ -95,12 +95,12 @@ IO命令集与IO队列对搭配使用。本规范定义了名为NVM命令集的I
 
 图 5 演示了一个带有两个 PCIe 端口的 NVM 子系统，每个端口都关联一个控制器。两个控制器都映射到相应端口的 PCI Function 0。在这个示例中，每个 PCIe 端口都是完全独立的，并具有独立的 PCIe 复位和时钟输入。端口的复位只影响与该端口关联的控制器，不会影响其他控制器、共享命名空间或由其他控制器在共享命名空间上执行的操作。
 
-![figure-5-NVMSubSystemWithTwoControllerAndTwoPorts](/Users/kangjia/code/nvme-spec-1.4c/images/figure-5-NVMSubSystemWithTwoControllerAndTwoPorts.png)
+![figure-5-NVMSubSystemWithTwoControllerAndTwoPorts](images/figure-5-NVMSubSystemWithTwoControllerAndTwoPorts.png)
 
 图5中两个端口可能与相同或不同的Root Complex关联，用以实现多路径和共享命名空间架构。PCI Express 结构中的系统级架构方面和多个端口的使用超出了本规范的范围。
 图6为支持 Single Root I/O Virtualization（SR/IOV）的 NVM 子系统，其有一个物理 Function 和四个虚拟 Function。如图，每个Function 都有一个关联的 Controller，每个 Controller 都有一个私有的 命名空间和对所有控制器共享的 NS F 的访问权限。此示例中控制器的行为与本节中其他示例的行为类似。 有关 SR-IOV 的更多信息，请参阅第 8.5.4 节。
 
-![figure-6-PCIExpressSuportSRIOV](/Users/kangjia/code/nvme-spec-1.4c/images/figure-6-PCIExpressSuportSRIOV.png)
+![figure-6-PCIExpressSuportSRIOV](images/figure-6-PCIExpressSuportSRIOV.png)
 
 本节中所列示例旨在说明概念，而非枚举所有可能的配置。 例如，NVM 子系统可能包含多个 PCI Express 端口，每个端口都支持 SR-IOV。
 
